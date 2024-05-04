@@ -28,7 +28,7 @@ If the player find the answer before the end of his 10 tries, he win, otherwise,
 #========
 
 import random
-
+import os
 
 
 #___________ CODE ___________#
@@ -44,10 +44,10 @@ def start_game():
     # Select 4 random numbers using a lambda function in a list comprehension
     obj = [(lambda x: random.randint(0,5))(x) for x in range(4)] 
     
-    return print(obj)
+    return obj
 
 
-def comparaison(nb1 : list , nb2 : int):
+def comparaison(nb1 : list , nb2 : str):
     """
     This function is used to compare the number entered by the player and the code to find.
 
@@ -56,7 +56,9 @@ def comparaison(nb1 : list , nb2 : int):
         nb2 (int): this is the number entered by the player.
 
     Returns:
-
+        nb2 (list) : the number given by the player in list format.
+        good_number (int) : the number of good number in the player's code.
+        good_position (int) : the number of good number at the good position in the player's code.
     """
 
     # Fisrt I convert the number of the player in a list
@@ -84,23 +86,31 @@ def comparaison(nb1 : list , nb2 : int):
             good_number -= 1 # Very important to retire one here to not count twice a number both in good and good+good_position (because good_number is already implicit in good_position)
             ind_good_position.append(i) # I add the index of the good number at the good position in my list
     
-    print(f"Good number : {good_number}")
-    print(f"Good position : {good_position}")
+    # print(f"Good number : {good_number}")
+    # print(f"Good position : {good_position}")
 
-    return nb2
+    return nb2, good_number, good_position
 
 
-def print_board(attempt: list):
+def print_board(attempts: list, good_number: int, good_position: int):
     """
     This function is used to print the board game.
     I want something like this :
 
+    ********************
     _________________
     |   |   |   |   |
     | ? | ? | ? | ? |
     |___|___|___|___|
 
-    Where "?" are the numbers given by the player
+    x : (number)
+    o : (number)
+
+    *********************
+
+    Where "?" are the numbers given by the player,
+    "x" give the number of good number
+    "o" give the number of good number at the good position 
 
     Args:
         attempt (list) : the code given by the player
@@ -111,13 +121,54 @@ def print_board(attempt: list):
 
     print(f"_________________")
     print(f"|   |   |   |   |")
-    print(f"| {attempt[0]} | {attempt[1]} | {attempt[2]} | {attempt[3]} |")
+    for tries in attempts:
+        print(f"| {tries[0]} | {tries[1]} | {tries[2]} | {tries[3]} |")
     print(f"|___|___|___|___|")
+    print()
+    print(f"x : {good_number}")
+    print(f"o : {good_position}")
 
-    pass
+    return True 
 
 
 if __name__ == '__main__':
     # start_game()
-    # comparaison([1,2,3,4], '4213')
-    print_board([1,2,3,4])
+    # print(comparaison([1,2,3,4], '4213'))
+    # print_board([1,2,3,4])
+
+    # START GAME
+    code = start_game()
+
+    # PLAY 
+    running = True
+    life = 10
+    old_attempts = []
+
+    while running:
+        choice = input("Try : ") # We take the player's choice
+
+        choice, good_number, good_position = comparaison(code, choice)
+        old_attempts.append(choice)
+
+        # PRINT BOARD
+        print_board(old_attempts, good_number=good_number, good_position=good_position)
+
+        # VICTORY / LOOSE
+        if good_position == 4:
+            print(f"YOU WIN IN {10-life} shots.")
+            running = False
+        elif good_position != 4:
+            life -= 1
+            
+        # CHECK PLAYER'S LIFE
+        if life <= 0:
+            print("YOU LOOSE...")
+            running = False
+
+    print("*** END ***")
+
+# NOTES
+"""
+I have to add the number of "o" and "x" next to each line !
+And maybe add a os.system('clear') in the print_board() function to clear the terminal each turn.
+"""
