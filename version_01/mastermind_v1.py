@@ -92,7 +92,7 @@ def comparaison(nb1 : list , nb2 : str):
     return nb2, good_number, good_position
 
 
-def print_board(attempts: list, good_number: int, good_position: int):
+def print_board(attempts: list, good_number: int, good_position: int, old_results : list):
     """
     This function is used to print the board game.
     I want something like this :
@@ -121,12 +121,12 @@ def print_board(attempts: list, good_number: int, good_position: int):
 
     print(f"_________________")
     print(f"|   |   |   |   |")
-    for tries in attempts:
-        print(f"| {tries[0]} | {tries[1]} | {tries[2]} | {tries[3]} |")
+    for i in range(len(attempts)):
+        print(f"| {attempts[i][0]} | {attempts[i][1]} | {attempts[i][2]} | {attempts[i][3]} |  x : {old_results[i][0]}   o : {old_results[i][1]}")
     print(f"|___|___|___|___|")
-    print()
-    print(f"x : {good_number}")
-    print(f"o : {good_position}")
+    # print()
+    # print(f"x : {good_number}")
+    # print(f"o : {good_position}")
 
     return True 
 
@@ -143,15 +143,18 @@ if __name__ == '__main__':
     running = True
     life = 10
     old_attempts = []
+    old_results = [] # We stock the "o" and "x" previous result in this list to print them each turn
 
     while running:
         choice = input("Try : ") # We take the player's choice
 
         choice, good_number, good_position = comparaison(code, choice)
         old_attempts.append(choice)
+        old_results.append([good_number, good_position])
 
         # PRINT BOARD
-        print_board(old_attempts, good_number=good_number, good_position=good_position)
+        os.system('clear')
+        print_board(old_attempts, good_number=good_number, good_position=good_position, old_results=old_results)
 
         # VICTORY / LOOSE
         if good_position == 4:
@@ -162,13 +165,9 @@ if __name__ == '__main__':
             
         # CHECK PLAYER'S LIFE
         if life <= 0:
-            print("YOU LOOSE...")
+            print(f"YOU LOOSE... The code was {code}.")
             running = False
 
     print("*** END ***")
 
 # NOTES
-"""
-I have to add the number of "o" and "x" next to each line !
-And maybe add a os.system('clear') in the print_board() function to clear the terminal each turn.
-"""
